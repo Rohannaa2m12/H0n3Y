@@ -1216,3 +1216,90 @@ class HoneyVectorEngine:
             "NZ-CHC": RegionalProfile(
                 "NZ-CHC",
                 "Canterbury plains",
+                0.48,
+                0.52,
+                ["herbal stem", "stone fruit"],
+            ),
+            "NZ-ZQN": RegionalProfile(
+                "NZ-ZQN",
+                "Southern alpine glen",
+                0.39,
+                0.61,
+                ["pine resin", "snowmelt"],
+            ),
+            "AU-TAS": RegionalProfile(
+                "AU-TAS",
+                "Tasmanian leatherwood cross",
+                0.58,
+                0.44,
+                ["spice cabinet", "molasses edge"],
+            ),
+        }
+
+    def list_regions(self) -> List[Dict[str, Any]]:
+        out: List[Dict[str, Any]] = []
+        for k, p in self._profiles.items():
+            out.append(
+                {
+                    "code": k,
+                    "display": p.display,
+                    "humidity_bias": p.humidity_bias,
+                    "wind_bias": p.wind_bias,
+                    "floral_notes": p.floral_notes,
+                }
+            )
+        return out
+
+    def score(self, region: str, mgo: float, umf: float, note: str, model: str) -> Dict[str, Any]:
+        p = self._profiles.get(region)
+        if not p:
+            raise KeyError("unknown region")
+        base = max(0.0, mgo) * 0.004 + umf * 1.15
+        slope = p.humidity_bias + p.wind_bias
+        idx = (len(note) + ord(note[0] if note else "A")) % 186
+        fn = "_regional_variant_" + str(idx)
+        g = globals()
+        if fn not in g:
+            blended = base
+        else:
+            blended = float(g[fn](base, slope))
+        digest = _digest_text(model, region, note)
+        vec = _keccak256(f"{digest}|{region}|{model}".encode("utf-8")).hex()
+        return {
+            "region": region,
+            "blended_score": round(blended, 4),
+            "digest": digest,
+            "vector": "0x" + vec,
+            "anchors": {
+                "example_curator": EXAMPLE_ROLE_A,
+                "example_oracle": EXAMPLE_ROLE_B,
+                "example_liaison": EXAMPLE_ROLE_C,
+            },
+        }
+
+    def maybe_cast(self, who: str) -> None:
+        now = time.time()
+        last = self._last_cast.get(who, 0.0)
+        if now - last < COOLDOWN_SEC:
+            raise PermissionError("cooldown")
+        self._last_cast[who] = now
+
+
+_ENGINE = HoneyVectorEngine()
+
+
+class H0n3YHandler(http.server.BaseHTTPRequestHandler):
+    server_version = "H0n3Y/1.0"
+
+    def _send_json(self, code: int, payload: Any) -> None:
+        body = json.dumps(payload).encode("utf-8")
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_OPTIONS(self) -> None:  # noqa: N802
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", "*")
