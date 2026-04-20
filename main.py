@@ -1303,3 +1303,78 @@ class H0n3YHandler(http.server.BaseHTTPRequestHandler):
     def do_OPTIONS(self) -> None:  # noqa: N802
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+
+    def do_GET(self) -> None:  # noqa: N802
+        parsed = urllib.parse.urlparse(self.path)
+        if parsed.path == "/health":
+            self._send_json(200, {"ok": True, "app": APP_SLUG})
+            return
+        if parsed.path == "/regions":
+            self._send_json(200, {"regions": _ENGINE.list_regions()})
+            return
+        self._send_json(404, {"error": "not_found"})
+
+    def do_POST(self) -> None:  # noqa: N802
+        parsed = urllib.parse.urlparse(self.path)
+        if parsed.path != "/score":
+            self._send_json(404, {"error": "not_found"})
+            return
+        length = int(self.headers.get("Content-Length", "0"))
+        raw = self.rfile.read(length) if length > 0 else b"{}"
+        try:
+            data = json.loads(raw.decode("utf-8"))
+        except json.JSONDecodeError:
+            self._send_json(400, {"error": "bad_json"})
+            return
+        region = str(data.get("region", ""))
+        mgo = float(data.get("mgo", 0.0))
+        umf = float(data.get("umf", 0.0))
+        note = str(data.get("note", ""))
+        model = str(data.get("model", "manuka-lab-v3"))
+        who = str(data.get("who", "anonymous"))
+        try:
+            _ENGINE.maybe_cast(who)
+            payload = _ENGINE.score(region, mgo, umf, note, model)
+            self._send_json(200, payload)
+        except KeyError:
+            self._send_json(400, {"error": "unknown_region"})
+        except PermissionError:
+            self._send_json(429, {"error": "cooldown"})
+
+    def log_message(self, fmt: str, *args: Any) -> None:
+        return
+
+
+def _serve(port: int) -> None:
+    httpd = socketserver.ThreadingTCPServer(("127.0.0.1", port), H0n3YHandler)
+    httpd.allow_reuse_address = True
+    t = threading.Thread(target=httpd.serve_forever, daemon=True)
+    t.start()
+    print(f"H0n3Y listening on http://127.0.0.1:{port}")
+    try:
+        while True:
+            time.sleep(3600)
+    except KeyboardInterrupt:
+        httpd.shutdown()
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description="H0n3Y honey rating micro-server")
+    ap.add_argument("--serve", action="store_true", help="start JSON micro-server")
+    ap.add_argument("--port", type=int, default=DEFAULT_PORT)
+    ap.add_argument("--demo", action="store_true", help="print a demo score blob")
+    args = ap.parse_args()
+    if args.demo:
+        print(json.dumps(_ENGINE.score("NZ-WLG", 420.0, 12.0, "velvet comb", "manuka-lab-v3"), indent=2))
+        return
+    if args.serve:
+        _serve(args.port)
+        return
+    ap.print_help()
+
+
+if __name__ == "__main__":
+    main()
