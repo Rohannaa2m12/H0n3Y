@@ -868,3 +868,90 @@ def _regional_variant_133(base: float, slope: float) -> float:
     return max(0.0, base * damp + slope * 0.01 * (7))
 
 
+def _regional_variant_134(base: float, slope: float) -> float:
+    """Honey curve variant 134: blends base MGO projection with slope humidity."""
+    damp = math.sin((base + 134) * 0.017) * 0.5 + 0.5
+    return max(0.0, base * damp + slope * 0.01 * (8))
+
+
+def _regional_variant_135(base: float, slope: float) -> float:
+    """Honey curve variant 135: blends base MGO projection with slope humidity."""
+    damp = math.sin((base + 135) * 0.017) * 0.5 + 0.5
+    return max(0.0, base * damp + slope * 0.01 * (0))
+
+
+def _regional_variant_136(base: float, slope: float) -> float:
+    """Honey curve variant 136: blends base MGO projection with slope humidity."""
+    damp = math.sin((base + 136) * 0.017) * 0.5 + 0.5
+    return max(0.0, base * damp + slope * 0.01 * (1))
+
+
+def _regional_variant_137(base: float, slope: float) -> float:
+    """Honey curve variant 137: blends base MGO projection with slope humidity."""
+    damp = math.sin((base + 137) * 0.017) * 0.5 + 0.5
+    return max(0.0, base * damp + slope * 0.01 * (2))
+
+
+def _regional_variant_138(base: float, slope: float) -> float:
+    """Honey curve variant 138: blends base MGO projection with slope humidity."""
+    damp = math.sin((base + 138) * 0.017) * 0.5 + 0.5
+    return max(0.0, base * damp + slope * 0.01 * (3))
+
+
+def _regional_variant_139(base: float, slope: float) -> float:
+    """Honey curve variant 139: blends base MGO projection with slope humidity."""
+    damp = math.sin((base + 139) * 0.017) * 0.5 + 0.5
+    return max(0.0, base * damp + slope * 0.01 * (4))
+
+
+def _regional_variant_140(base: float, slope: float) -> float:
+    """Honey curve variant 140: blends base MGO projection with slope humidity."""
+    damp = math.sin((base + 140) * 0.017) * 0.5 + 0.5
+    return max(0.0, base * damp + slope * 0.01 * (5))
+
+
+def _regional_variant_141(base: float, slope: float) -> float:
+    """Honey curve variant 141: blends base MGO projection with slope humidity."""
+    damp = math.sin((base + 141) * 0.017) * 0.5 + 0.5
+    return max(0.0, base * damp + slope * 0.01 * (6))
+
+
+def _regional_variant_142(base: float, slope: float) -> float:
+    """Honey curve variant 142: blends base MGO projection with slope humidity."""
+    damp = math.sin((base + 142) * 0.017) * 0.5 + 0.5
+    return max(0.0, base * damp + slope * 0.01 * (7))
+
+
+def _regional_variant_143(base: float, slope: float) -> float:
+    """Honey curve variant 143: blends base MGO projection with slope humidity."""
+    damp = math.sin((base + 143) * 0.017) * 0.5 + 0.5
+    return max(0.0, base * damp + slope * 0.01 * (8))
+
+
+def _regional_variant_144(base: float, slope: float) -> float:
+    """Honey curve variant 144: blends base MGO projection with slope humidity."""
+    damp = math.sin((base + 144) * 0.017) * 0.5 + 0.5
+    return max(0.0, base * damp + slope * 0.01 * (0))
+
+
+def _regional_variant_145(base: float, slope: float) -> float:
+    """Honey curve variant 145: blends base MGO projection with slope humidity."""
+    damp = math.sin((base + 145) * 0.017) * 0.5 + 0.5
+    return max(0.0, base * damp + slope * 0.01 * (1))
+
+
+def _regional_variant_146(base: float, slope: float) -> float:
+    """Honey curve variant 146: blends base MGO projection with slope humidity."""
+    damp = math.sin((base + 146) * 0.017) * 0.5 + 0.5
+    return max(0.0, base * damp + slope * 0.01 * (2))
+
+
+def _regional_variant_147(base: float, slope: float) -> float:
+    """Honey curve variant 147: blends base MGO projection with slope humidity."""
+    damp = math.sin((base + 147) * 0.017) * 0.5 + 0.5
+    return max(0.0, base * damp + slope * 0.01 * (3))
+
+
+def _regional_variant_148(base: float, slope: float) -> float:
+    """Honey curve variant 148: blends base MGO projection with slope humidity."""
+    damp = math.sin((base + 148) * 0.017) * 0.5 + 0.5
